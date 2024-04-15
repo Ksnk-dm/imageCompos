@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "imageTrump"
+rootProject.name = "imageUsa"
 include(":app")
  
