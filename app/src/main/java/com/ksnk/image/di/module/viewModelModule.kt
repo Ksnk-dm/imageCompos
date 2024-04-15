@@ -1,6 +1,6 @@
 package com.ksnk.image.di.module
 
-import com.ksnk.image.MainViewModel
+import com.ksnk.image.ui.main.MainViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

@@ -94,5 +94,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
 
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.5")
+    implementation ("com.airbnb.android:lottie-compose:6.0.0")
 
 }

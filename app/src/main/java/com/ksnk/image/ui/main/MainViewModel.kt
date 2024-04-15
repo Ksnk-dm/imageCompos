@@ -1,4 +1,4 @@
-package com.ksnk.image
+package com.ksnk.image.ui.main
 
 import android.app.Application
 import android.app.DownloadManager
@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.ksnk.image.DataItem
 import com.ksnk.image.remote.repository.Repository
 import kotlinx.coroutines.launch
 import java.io.File

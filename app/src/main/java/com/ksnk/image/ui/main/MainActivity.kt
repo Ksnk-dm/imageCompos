@@ -1,9 +1,8 @@
-package com.ksnk.image
+package com.ksnk.image.ui.main
 
 import android.app.WallpaperManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,28 +36,34 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.ksnk.image.DataItem
+import com.ksnk.image.R
 import com.ksnk.image.ui.theme.ImageTrumpTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.net.URL
@@ -84,18 +89,20 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(
                         navController = navController,
-                        startDestination = "firstscreen"
+                        startDestination = ROUTE_SPLASH_SCREEN
                     ) {
-                        composable("firstscreen") {
-Log.d("MESSAGE::: ", expandedUrlState.orEmpty().toString())
-                            MyComposeList(
-                                data = expandedUrlState.orEmpty(), modifier = Modifier
-                                    .fillMaxWidth(),
+                        composable(ROUTE_HOME_SCREEN) {
+                            HomeScreen(
+                                data = expandedUrlState.orEmpty(),
                                 navController = navController
                             )
                         }
-                        composable("secondscreen") {
-                            SecondScreen(navController)
+                        composable(ROUTE_PICTURE_SCREEN) {
+                            PictureScreen(navController)
+                        }
+
+                        composable(ROUTE_SPLASH_SCREEN) {
+                            SplashScreen(navController)
                         }
                     }
                 }
@@ -104,21 +111,16 @@ Log.d("MESSAGE::: ", expandedUrlState.orEmpty().toString())
     }
 
 
-    fun generateData(list: List<DataItem>): List<DataItem> {
-        return list
-    }
-
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SecondScreen(navController: NavController) {
+    fun PictureScreen(navController: NavController) {
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
 
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            val msg = navController.previousBackStackEntry?.savedStateHandle?.get<String>("msg")
+            val msg = navController.previousBackStackEntry?.savedStateHandle?.get<String>(KEY_URL)
             Image(
                 painter = rememberAsyncImagePainter(msg),
                 contentDescription = "",
@@ -192,51 +194,68 @@ Log.d("MESSAGE::: ", expandedUrlState.orEmpty().toString())
     }
 
     @Composable
-    fun MyComposeList(
-        modifier: Modifier = Modifier,
-        data: List<DataItem>,
+    fun SplashScreen(navController: NavController) {
+        val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.splash))
+
+        val progress by animateLottieCompositionAsState(
+            composition = composition,
+            iterations = LottieConstants.IterateForever
+        )
+        LottieAnimation(
+            composition = composition,
+            progress = {
+                progress
+            }
+        )
+        LaunchedEffect(Unit) {
+            delay(2000)
+            navController.navigate(ROUTE_HOME_SCREEN) {
+                popUpTo(ROUTE_SPLASH_SCREEN) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun HomeScreen(
+        data: List<DataItem>?,
         navController: NavController
     ) {
         LazyVerticalGrid(
-            columns = object : GridCells {
-                override fun Density.calculateCrossAxisCellSizes(
-                    availableSize: Int,
-                    spacing: Int
-                ): List<Int> {
-                    val firstColumn = (availableSize - spacing) * 2 / 3
-                    val secondColumn = availableSize - spacing - firstColumn
-                    return listOf(firstColumn, secondColumn)
-                }
-            },
+            columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(24.dp)
         ) {
-            data.forEachIndexed { index, item ->
-                if (index % 3 == 0) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        MyCard(dataItem = item, navController)
-                    }
-                } else {
-                    item(span = { GridItemSpan(1) }) {
-                        MyCard(dataItem = item, navController)
-                    }
+            data?.forEachIndexed { _, item ->
+                item(span = { GridItemSpan(1) }) {
+                    ImageCard(dataItem = item, navController)
                 }
+//                if (index % 10 == 0) {
+//                    item(span = { GridItemSpan(maxLineSpan) }) {
+//                        ImageCard(dataItem = item, navController)
+//                    }
+//                } else {
+//                    item(span = { GridItemSpan(1) }) {
+//                        ImageCard(dataItem = item, navController)
+//                    }
+//                }
             }
         }
     }
 
 
     @Composable
-    fun MyCard(
+    fun ImageCard(
         dataItem: DataItem,
         navController: NavController
     ) {
         Card(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(10.dp),
             modifier = Modifier
-                .height(180.dp)
-                .width(140.dp)
+                .height(280.dp)
+                .width(200.dp)
         ) {
             Image(
                 rememberAsyncImagePainter(dataItem.url),
@@ -245,12 +264,11 @@ Log.d("MESSAGE::: ", expandedUrlState.orEmpty().toString())
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .clickable {
-                        Log.d("MESSAGE::: ", dataItem.url.toString())
                         navController.currentBackStackEntry?.savedStateHandle?.set(
-                            "msg",
+                            KEY_URL,
                             dataItem.url
                         )
-                        navController.navigate("secondscreen")
+                        navController.navigate(ROUTE_PICTURE_SCREEN)
                     },
 
                 contentScale = ContentScale.Crop,
@@ -264,18 +282,6 @@ Log.d("MESSAGE::: ", expandedUrlState.orEmpty().toString())
                         bottom = 16.dp
                     )
             ) {
-                Text(
-                    text = dataItem.url.toString(),
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = dataItem.url.toString(),
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
             }
         }
     }
@@ -286,23 +292,28 @@ Log.d("MESSAGE::: ", expandedUrlState.orEmpty().toString())
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = "firstscreen"
+            startDestination = ROUTE_SPLASH_SCREEN
         ) {
-            composable("firstscreen") {
-                MyComposeList(
-                    data = viewModel.getExpandedUrlLiveData().value!!, modifier = Modifier
-                        .fillMaxWidth(),
+            composable(ROUTE_HOME_SCREEN) {
+                HomeScreen(
+                    data = viewModel.getExpandedUrlLiveData().value,
                     navController = navController
                 )
             }
-            composable("secondscreen") {
-                SecondScreen(navController)
+            composable(ROUTE_PICTURE_SCREEN) {
+                PictureScreen(navController)
+            }
+            composable(ROUTE_SPLASH_SCREEN) {
+                SplashScreen(navController = navController)
             }
         }
-//    MyComposeList(
-//        data = generateData(), modifier = Modifier
-//            .fillMaxWidth(), navController =navController
-//
-//    )
+    }
+
+    companion object {
+        const val ROUTE_HOME_SCREEN = "home_screen"
+        const val ROUTE_PICTURE_SCREEN = "picture_screen"
+        const val ROUTE_SPLASH_SCREEN = "splash_screen"
+
+        const val KEY_URL = "img"
     }
 }
