@@ -8,9 +8,24 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import com.ksnk.image.remote.repository.Repository
+import kotlinx.coroutines.launch
 import java.io.File
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application) {
+
+    private val expandedUrlLiveData = repository.fileInfoModelLiveData()
+
+    fun getExpandedUrlLiveData(): LiveData<List<DataItem>> =
+        expandedUrlLiveData
+
+    fun expandShortenedUrl() {
+        viewModelScope.launch {
+            repository.getApiData()
+        }
+    }
 
     fun downloadFile(fileInfo: String, context: Context): File? = runCatching {
         if (!File(
@@ -41,7 +56,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         File(File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             "USA IMAGES/IMAGES"
-        ),"$fileInfo.jpg")
+        ),"${System.currentTimeMillis()}.jpg")
     }.onFailure { e ->
         Toast.makeText(context, "Download failed! ${e.message}", Toast.LENGTH_SHORT).show()
     }.getOrNull()

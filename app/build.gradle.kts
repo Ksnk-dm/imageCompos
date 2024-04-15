@@ -93,4 +93,6 @@ dependencies {
     //Reflection
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
 
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.5")
+
 }

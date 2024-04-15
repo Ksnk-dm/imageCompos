@@ -1,6 +1,8 @@
 package com.ksnk.image
 
+import com.google.gson.annotations.SerializedName
+
 data class DataItem(
-    val text: String?,
-    val image: String?,
+    @SerializedName("url")
+    val url: String?,
 )
