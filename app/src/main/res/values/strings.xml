@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">imageTrump</string>
+    <string name="app_name">USA Wallpaper</string>
+
+    <string name="set">Wallpaper set</string>
+    <string name="start">Download started!</string>
+    <string name="failed">Download failed!</string>
 </resources>

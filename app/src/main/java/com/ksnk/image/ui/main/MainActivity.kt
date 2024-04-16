@@ -120,9 +120,9 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            val msg = navController.previousBackStackEntry?.savedStateHandle?.get<String>(KEY_URL)
+            val url = navController.previousBackStackEntry?.savedStateHandle?.get<String>(KEY_URL)
             Image(
-                painter = rememberAsyncImagePainter(msg),
+                painter = rememberAsyncImagePainter(url),
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -149,7 +149,7 @@ class MainActivity : ComponentActivity() {
             ) {
 
                 IconButton(
-                    onClick = { viewModel.downloadFile(msg ?: "", context) },
+                    onClick = { viewModel.downloadFile(url ?: "", context) },
                     modifier = Modifier.padding(bottom = 15.dp)
                 ) {
                     Icon(
@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                         coroutineScope.launch {
                             val task = async(Dispatchers.IO) {
                                 BitmapFactory.decodeStream(
-                                    URL(msg).openConnection().getInputStream()
+                                    URL(url).openConnection().getInputStream()
                                 )
                             }
 
@@ -178,7 +178,7 @@ class MainActivity : ComponentActivity() {
                                 WallpaperManager.FLAG_SYSTEM
                             )
 
-                            Toast.makeText(context, "Wallpaper set", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getText(R.string.set), Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.padding(bottom = 15.dp)
@@ -232,19 +232,9 @@ class MainActivity : ComponentActivity() {
                 item(span = { GridItemSpan(1) }) {
                     ImageCard(dataItem = item, navController)
                 }
-//                if (index % 10 == 0) {
-//                    item(span = { GridItemSpan(maxLineSpan) }) {
-//                        ImageCard(dataItem = item, navController)
-//                    }
-//                } else {
-//                    item(span = { GridItemSpan(1) }) {
-//                        ImageCard(dataItem = item, navController)
-//                    }
-//                }
             }
         }
     }
-
 
     @Composable
     fun ImageCard(

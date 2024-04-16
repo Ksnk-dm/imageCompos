@@ -11,11 +11,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.ksnk.image.DataItem
+import com.ksnk.image.R
 import com.ksnk.image.remote.repository.Repository
 import kotlinx.coroutines.launch
 import java.io.File
 
-class MainViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application) {
+class MainViewModel(
+    private val repository: Repository,
+    private val application: Application
+) : AndroidViewModel(application) {
 
     private val expandedUrlLiveData = repository.fileInfoModelLiveData()
 
@@ -29,36 +33,42 @@ class MainViewModel(private val repository: Repository, application: Application
     }
 
     fun downloadFile(fileInfo: String, context: Context): File? = runCatching {
-        if (!File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "USA IMAGES/IMAGES"
-            ).exists()) {
-            File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "USA IMAGES/IMAGES"
-            ).mkdirs()
+        if (!FILE_ENVIRONMENT.exists()) {
+            FILE_ENVIRONMENT.mkdirs()
         }
         val dm = ContextCompat.getSystemService(context, DownloadManager::class.java)
         val downloadUri = Uri.parse(fileInfo)
         val request = DownloadManager.Request(downloadUri)
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
             .setAllowedOverRoaming(false)
-            .setTitle("download")
-            .setMimeType("jpg/*")
+            .setTitle(TITLE)
+            .setMimeType(MIME_TYPE)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationUri(Uri.fromFile(File( File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "USA IMAGES/IMAGES"
-            ), "${System.currentTimeMillis()}.jpg")))
+            .setDestinationUri(
+                Uri.fromFile(
+                    File(
+                        FILE_ENVIRONMENT,
+                        "${System.currentTimeMillis()}$FORMAT"
+                    )
+                )
+            )
 
         dm?.enqueue(request)
 
-        Toast.makeText(context, "Download started!", Toast.LENGTH_SHORT).show()
-        File(File(
+        Toast.makeText(context, context.getText(R.string.start), Toast.LENGTH_SHORT).show()
+        File(FILE_ENVIRONMENT, "${System.currentTimeMillis()}$FORMAT")
+    }.onFailure { e ->
+        Toast.makeText(context, "${context.getText(R.string.failed)} ${e.message}", Toast.LENGTH_SHORT).show()
+    }.getOrNull()
+
+    companion object {
+        val FILE_ENVIRONMENT = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             "USA IMAGES/IMAGES"
-        ),"${System.currentTimeMillis()}.jpg")
-    }.onFailure { e ->
-        Toast.makeText(context, "Download failed! ${e.message}", Toast.LENGTH_SHORT).show()
-    }.getOrNull()
+        )
+
+        const val TITLE = "Download"
+        const val MIME_TYPE = "jpg/*"
+        const val FORMAT = ".jpg"
+    }
 }
