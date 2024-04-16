@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.ksnk.image.DataItem
 import com.ksnk.image.R
+import com.ksnk.image.remote.model.DataItem
 import com.ksnk.image.remote.repository.Repository
 import kotlinx.coroutines.launch
 import java.io.File

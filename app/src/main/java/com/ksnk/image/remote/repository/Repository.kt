@@ -2,8 +2,8 @@ package com.ksnk.image.remote.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.ksnk.image.DataItem
 import com.ksnk.image.remote.RemoteDataSource
+import com.ksnk.image.remote.model.DataItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

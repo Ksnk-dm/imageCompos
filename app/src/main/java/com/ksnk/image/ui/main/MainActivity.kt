@@ -58,8 +58,8 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.ksnk.image.DataItem
 import com.ksnk.image.R
+import com.ksnk.image.remote.model.DataItem
 import com.ksnk.image.ui.theme.ImageTrumpTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
