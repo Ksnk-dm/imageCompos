@@ -3,6 +3,7 @@ package com.ksnk.image.ui.main
 import android.app.WallpaperManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Environment
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -48,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,15 +60,25 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.ksnk.image.R
-import com.ksnk.image.remote.model.DataItem
-import com.ksnk.image.ui.theme.ImageTrumpTheme
+import com.ksnk.image.remote.model.DataModel
+import com.ksnk.image.ui.theme.ImageUsaTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.io.File
 import java.net.URL
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
 
@@ -77,15 +89,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        viewModel.expandShortenedUrl()
+        MobileAds.initialize(this) {}
+
+        viewModel.loadDataFromUrl()
 
         setContent {
-            ImageTrumpTheme {
+            ImageUsaTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val expandedUrlState by viewModel.getExpandedUrlLiveData().observeAsState()
+                    val urlState by viewModel.urlLiveData().observeAsState()
                     val navController = rememberNavController()
                     NavHost(
                         navController = navController,
@@ -93,7 +107,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(ROUTE_HOME_SCREEN) {
                             HomeScreen(
-                                data = expandedUrlState.orEmpty(),
+                                data = urlState.orEmpty(),
                                 navController = navController
                             )
                         }
@@ -110,6 +124,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun AdmobBanner(modifier: Modifier = Modifier) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                AdView(context).apply {
+                    setAdSize(AdSize.BANNER)
+                    adUnitId = AD_ID_BANNER
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -178,7 +205,11 @@ class MainActivity : ComponentActivity() {
                                 WallpaperManager.FLAG_SYSTEM
                             )
 
-                            Toast.makeText(context, context.getText(R.string.set), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                context.getText(R.string.set),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     modifier = Modifier.padding(bottom = 15.dp)
@@ -219,26 +250,35 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun HomeScreen(
-        data: List<DataItem>?,
+        data: List<DataModel>?,
         navController: NavController
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(24.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            data?.forEachIndexed { _, item ->
-                item(span = { GridItemSpan(1) }) {
-                    ImageCard(dataItem = item, navController)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(24.dp)
+            ) {
+                data?.forEachIndexed { _, item ->
+                    item(span = { GridItemSpan(1) }) {
+                        ImageCard(dataModel = item, navController)
+                    }
                 }
             }
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .align(Alignment.BottomCenter)
+            ) { AdmobBanner(modifier = Modifier.fillMaxWidth()) }
         }
     }
 
     @Composable
     fun ImageCard(
-        dataItem: DataItem,
+        dataModel: DataModel,
         navController: NavController
     ) {
         Card(
@@ -248,17 +288,17 @@ class MainActivity : ComponentActivity() {
                 .width(200.dp)
         ) {
             Image(
-                rememberAsyncImagePainter(dataItem.url),
+                rememberAsyncImagePainter(dataModel.url),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .clickable {
-                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                            KEY_URL,
-                            dataItem.url
+                        if (Random.nextInt(0, 11) % RANDOM == 0) showInterstialAd(
+                            navController,
+                            dataModel.url ?: ""
                         )
-                        navController.navigate(ROUTE_PICTURE_SCREEN)
+                        else navigateToPicture(navController, dataModel.url)
                     },
 
                 contentScale = ContentScale.Crop,
@@ -286,7 +326,7 @@ class MainActivity : ComponentActivity() {
         ) {
             composable(ROUTE_HOME_SCREEN) {
                 HomeScreen(
-                    data = viewModel.getExpandedUrlLiveData().value,
+                    data = viewModel.urlLiveData().value,
                     navController = navController
                 )
             }
@@ -299,11 +339,63 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    companion object {
-        const val ROUTE_HOME_SCREEN = "home_screen"
-        const val ROUTE_PICTURE_SCREEN = "picture_screen"
-        const val ROUTE_SPLASH_SCREEN = "splash_screen"
+    private fun navigateToPicture(navController: NavController, url: String?) {
+        navController.currentBackStackEntry?.savedStateHandle?.set(
+            KEY_URL,
+            url
+        )
+        navController.navigate(ROUTE_PICTURE_SCREEN)
+    }
 
-        const val KEY_URL = "img"
+    private fun showInterstialAd(navController: NavController, url: String) {
+        InterstitialAd.load(
+            this,
+            AD_ID_INTERESTIAL,
+            AdRequest.Builder().build(),
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                }
+
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    interstitialAd.show(this@MainActivity)
+                    interstitialAd.fullScreenContentCallback =
+                        object : FullScreenContentCallback() {
+                            override fun onAdClicked() {
+                                super.onAdClicked()
+                                navigateToPicture(navController, url)
+                            }
+
+                            override fun onAdShowedFullScreenContent() {
+                                super.onAdShowedFullScreenContent()
+                                navigateToPicture(navController, url)
+                            }
+                        }
+                }
+            }
+        )
+    }
+
+    companion object {
+        private const val ROUTE_HOME_SCREEN = "home_screen"
+        private const val ROUTE_PICTURE_SCREEN = "picture_screen"
+        private const val ROUTE_SPLASH_SCREEN = "splash_screen"
+
+        private const val KEY_URL = "img"
+
+        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/3282134189"
+        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/3281816956"
+
+        private const val RANDOM = 2
+
+        object FILE {
+            val ENVIRONMENT = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "USA IMAGES/IMAGES"
+            )
+
+            const val TITLE = "Picture"
+            const val MIME_TYPE = "jpg/*"
+            const val FORMAT = ".jpg"
+        }
     }
 }

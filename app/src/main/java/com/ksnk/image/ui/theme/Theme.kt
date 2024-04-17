@@ -32,7 +32,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun ImageTrumpTheme(
+fun ImageUsaTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = DarkColorScheme

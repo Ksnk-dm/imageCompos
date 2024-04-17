@@ -4,15 +4,18 @@ import android.app.Application
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.ksnk.image.R
-import com.ksnk.image.remote.model.DataItem
+import com.ksnk.image.remote.model.DataModel
 import com.ksnk.image.remote.repository.Repository
+import com.ksnk.image.ui.main.MainActivity.Companion.FILE.ENVIRONMENT
+import com.ksnk.image.ui.main.MainActivity.Companion.FILE.FORMAT
+import com.ksnk.image.ui.main.MainActivity.Companion.FILE.MIME_TYPE
+import com.ksnk.image.ui.main.MainActivity.Companion.FILE.TITLE
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -21,20 +24,20 @@ class MainViewModel(
     private val application: Application
 ) : AndroidViewModel(application) {
 
-    private val expandedUrlLiveData = repository.fileInfoModelLiveData()
+    private val urlLiveData = repository.fileInfoModelLiveData()
 
-    fun getExpandedUrlLiveData(): LiveData<List<DataItem>> =
-        expandedUrlLiveData
+    fun urlLiveData(): LiveData<List<DataModel>> =
+        urlLiveData
 
-    fun expandShortenedUrl() {
+    fun loadDataFromUrl() {
         viewModelScope.launch {
             repository.getApiData()
         }
     }
 
     fun downloadFile(fileInfo: String, context: Context): File? = runCatching {
-        if (!FILE_ENVIRONMENT.exists()) {
-            FILE_ENVIRONMENT.mkdirs()
+        if (!ENVIRONMENT.exists()) {
+            ENVIRONMENT.mkdirs()
         }
         val dm = ContextCompat.getSystemService(context, DownloadManager::class.java)
         val downloadUri = Uri.parse(fileInfo)
@@ -47,7 +50,7 @@ class MainViewModel(
             .setDestinationUri(
                 Uri.fromFile(
                     File(
-                        FILE_ENVIRONMENT,
+                        ENVIRONMENT,
                         "${System.currentTimeMillis()}$FORMAT"
                     )
                 )
@@ -56,19 +59,8 @@ class MainViewModel(
         dm?.enqueue(request)
 
         Toast.makeText(context, context.getText(R.string.start), Toast.LENGTH_SHORT).show()
-        File(FILE_ENVIRONMENT, "${System.currentTimeMillis()}$FORMAT")
+        File(ENVIRONMENT, "${System.currentTimeMillis()}$FORMAT")
     }.onFailure { e ->
         Toast.makeText(context, "${context.getText(R.string.failed)} ${e.message}", Toast.LENGTH_SHORT).show()
     }.getOrNull()
-
-    companion object {
-        val FILE_ENVIRONMENT = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-            "USA IMAGES/IMAGES"
-        )
-
-        const val TITLE = "Download"
-        const val MIME_TYPE = "jpg/*"
-        const val FORMAT = ".jpg"
-    }
 }

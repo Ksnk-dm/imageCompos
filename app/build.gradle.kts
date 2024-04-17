@@ -96,4 +96,6 @@ dependencies {
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.5")
     implementation ("com.airbnb.android:lottie-compose:6.0.0")
 
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
+
 }

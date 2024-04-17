@@ -3,15 +3,15 @@ package com.ksnk.image.remote.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ksnk.image.remote.RemoteDataSource
-import com.ksnk.image.remote.model.DataItem
+import com.ksnk.image.remote.model.DataModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class Repository(private val remoteDataSource: RemoteDataSource) {
 
-    private val fileInfoMutableLiveData = MutableLiveData<List<DataItem>>()
+    private val fileInfoMutableLiveData = MutableLiveData<List<DataModel>>()
 
-    fun fileInfoModelLiveData(): LiveData<List<DataItem>> =
+    fun fileInfoModelLiveData(): LiveData<List<DataModel>> =
         fileInfoMutableLiveData
 
     suspend fun getApiData() = withContext(Dispatchers.IO) {
