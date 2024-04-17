@@ -409,8 +409,8 @@ class MainActivity : ComponentActivity() {
 
         private const val KEY_URL = "img"
 
-        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/3282134189"
-        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/3281816956"
+        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/4143256887"
+        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/5699881134"
 
         private const val RANDOM = 2
 
