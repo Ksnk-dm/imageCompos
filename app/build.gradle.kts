@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ksnk.image"
+    namespace = "com.ksnk.israelimage"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ksnk.image"
+        applicationId = "com.ksnk.israelimage"
         minSdk = 30
         targetSdk = 34
         versionCode = 1
@@ -22,7 +22,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

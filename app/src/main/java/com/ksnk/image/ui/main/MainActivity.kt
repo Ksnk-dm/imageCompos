@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,12 +44,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -68,9 +73,9 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.ksnk.image.R
 import com.ksnk.image.remote.model.DataModel
-import com.ksnk.image.ui.theme.ImageUsaTheme
+import com.ksnk.image.ui.theme.ImageIsraelTheme
+import com.ksnk.israelimage.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -94,10 +99,12 @@ class MainActivity : ComponentActivity() {
         viewModel.loadDataFromUrl()
 
         setContent {
-            ImageUsaTheme {
+            ImageIsraelTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     val urlState by viewModel.urlLiveData().observeAsState()
                     val navController = rememberNavController()
@@ -232,12 +239,30 @@ class MainActivity : ComponentActivity() {
             composition = composition,
             iterations = LottieConstants.IterateForever
         )
-        LottieAnimation(
-            composition = composition,
-            progress = {
-                progress
+        Column(
+            modifier = Modifier
+                .background(Color.LightGray)
+        ) {
+            LottieAnimation(
+                composition = composition,
+                progress = {
+                    progress
+                }
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = getString(R.string.app_name),
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    color = Black
+                )
             }
-        )
+        }
         LaunchedEffect(Unit) {
             delay(2000)
             navController.navigate(ROUTE_HOME_SCREEN) {
@@ -254,7 +279,9 @@ class MainActivity : ComponentActivity() {
         navController: NavController
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.LightGray)
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),

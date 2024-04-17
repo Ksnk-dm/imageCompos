@@ -16,10 +16,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.ImageTrump"
-        android:name=".ImageApplication"
+        android:name="com.ksnk.image.ImageApplication"
         tools:targetApi="31">
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name="com.ksnk.image.ui.main.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ImageTrump">
