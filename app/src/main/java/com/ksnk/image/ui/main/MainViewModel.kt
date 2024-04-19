@@ -9,13 +9,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.ksnk.image.R
 import com.ksnk.image.remote.model.DataModel
 import com.ksnk.image.remote.repository.Repository
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.ENVIRONMENT
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.FORMAT
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.MIME_TYPE
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.TITLE
+import com.ksnk.israelimage.R
 import kotlinx.coroutines.launch
 import java.io.File
 

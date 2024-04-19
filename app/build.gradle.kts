@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.ksnk.image"
+    namespace = "com.ksnk.israelimage"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ksnk.image"
+        applicationId = "com.ksnk.israelimage"
         minSdk = 30
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
