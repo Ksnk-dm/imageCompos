@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,6 +26,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -119,7 +122,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(ROUTE_PICTURE_SCREEN) {
-                            PictureScreen(navController)
+                            HorizontalPagerPicture(
+                                navController = navController,
+                                urlState.orEmpty()
+                            )
                         }
 
                         composable(ROUTE_SPLASH_SCREEN) {
@@ -147,18 +153,18 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun PictureScreen(navController: NavController) {
+    fun PictureScreen(navController: NavController, listUrl: List<DataModel>, position: Int) {
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
 
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            val url = navController.previousBackStackEntry?.savedStateHandle?.get<String>(KEY_URL)
+            val url = listUrl[position].url
             Image(
                 painter = rememberAsyncImagePainter(url),
                 contentDescription = "",
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillHeight,
                 modifier = Modifier.fillMaxSize()
             )
             TopAppBar(
@@ -179,8 +185,29 @@ class MainActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .padding(20.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.scroll))
+
+                val progress by animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever
+                )
+
+                LottieAnimation(
+                    modifier = Modifier.size(100.dp),
+                    composition = composition,
+                    progress = {
+                        progress
+                    }
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
                     .align(Alignment.BottomEnd)
             ) {
+
 
                 IconButton(
                     onClick = { viewModel.downloadFile(url ?: "", context) },
@@ -289,9 +316,9 @@ class MainActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(24.dp)
             ) {
-                data?.forEachIndexed { _, item ->
+                data?.forEachIndexed { position, item ->
                     item(span = { GridItemSpan(1) }) {
-                        ImageCard(dataModel = item, navController)
+                        ImageCard(dataModel = item, navController, position)
                     }
                 }
             }
@@ -306,7 +333,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ImageCard(
         dataModel: DataModel,
-        navController: NavController
+        navController: NavController,
+        position: Int
     ) {
         Card(
             shape = RoundedCornerShape(10.dp),
@@ -323,9 +351,9 @@ class MainActivity : ComponentActivity() {
                     .clickable {
                         if (Random.nextInt(0, 11) % RANDOM == 0) showInterstialAd(
                             navController,
-                            dataModel.url ?: ""
+                            position
                         )
-                        else navigateToPicture(navController, dataModel.url)
+                        else navigateToPicture(navController, position)
                     },
 
                 contentScale = ContentScale.Crop,
@@ -343,38 +371,40 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Preview(showBackground = true)
     @Composable
-    fun GreetingPreview() {
-        val navController = rememberNavController()
-        NavHost(
-            navController = navController,
-            startDestination = ROUTE_SPLASH_SCREEN
-        ) {
-            composable(ROUTE_HOME_SCREEN) {
-                HomeScreen(
-                    data = viewModel.urlLiveData().value,
-                    navController = navController
-                )
-            }
-            composable(ROUTE_PICTURE_SCREEN) {
-                PictureScreen(navController)
-            }
-            composable(ROUTE_SPLASH_SCREEN) {
-                SplashScreen(navController = navController)
-            }
-        }
+    fun GreetingPreview(navController: NavController) {
+
     }
 
-    private fun navigateToPicture(navController: NavController, url: String?) {
+    private fun navigateToPicture(navController: NavController, position: Int) {
         navController.currentBackStackEntry?.savedStateHandle?.set(
-            KEY_URL,
-            url
+            KEY_POSITION,
+            position
         )
         navController.navigate(ROUTE_PICTURE_SCREEN)
     }
 
-    private fun showInterstialAd(navController: NavController, url: String) {
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun HorizontalPagerPicture(
+        navController: NavController,
+        urls: List<DataModel>
+    ) {
+        val position =
+            navController.previousBackStackEntry?.savedStateHandle?.get<Int>(KEY_POSITION)
+        val pagerState = rememberPagerState(pageCount = {
+            urls.size
+        }, initialPage = position ?: 0)
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            VerticalPager(state = pagerState) { page ->
+                PictureScreen(navController, urls, page)
+            }
+        }
+    }
+
+    private fun showInterstialAd(navController: NavController, url: Int) {
         InterstitialAd.load(
             this,
             AD_ID_INTERESTIAL,
@@ -407,7 +437,7 @@ class MainActivity : ComponentActivity() {
         private const val ROUTE_PICTURE_SCREEN = "picture_screen"
         private const val ROUTE_SPLASH_SCREEN = "splash_screen"
 
-        private const val KEY_URL = "img"
+        private const val KEY_POSITION = "position"
 
         private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/4143256887"
         private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/5699881134"
