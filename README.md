@@ -1,6 +1,6 @@
 # Image Viewer (Compose version) - Android App ![Build status](https://github.com/wallabag/android-app/workflows/CI/badge.svg?branch=master)
 
-<img src="https://i.ibb.co/5hK2h4H/savetiklogo-1.png" align="left"
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQi5lm5EQgowT3v5F2P0QC5Gia8yhlyPC-_jhwFtJ3Bqg&s" align="left"
 width="200" hspace="10" vspace="10">
 
 
