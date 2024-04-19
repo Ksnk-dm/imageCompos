@@ -8,6 +8,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,6 +52,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -54,7 +60,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -78,7 +83,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.ksnk.image.remote.model.DataModel
 import com.ksnk.image.ui.theme.ImageIsraelTheme
-import com.ksnk.israelimage.R
+import com.ksnk.kyivimage.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -266,28 +271,33 @@ class MainActivity : ComponentActivity() {
             composition = composition,
             iterations = LottieConstants.IterateForever
         )
-        Column(
-            modifier = Modifier
-                .background(Color.LightGray)
-        ) {
-            LottieAnimation(
-                composition = composition,
-                progress = {
-                    progress
-                }
-            )
-            Box(
+
+        Pulsating {
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .background(Color.White)
             ) {
-                Text(
-                    text = getString(R.string.app_name),
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
-                    color = Black
+                Image(
+                    modifier = Modifier
+                        .height(250.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 100.dp),
+                    painter = painterResource(id = R.drawable.splash),
+                    contentDescription = null
                 )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = getString(R.string.app_name),
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        color = Black
+                    )
+                }
             }
         }
         LaunchedEffect(Unit) {
@@ -301,6 +311,24 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
+    fun Pulsating(pulseFraction: Float = 1.2f, content: @Composable () -> Unit) {
+        val infiniteTransition = rememberInfiniteTransition(label = "")
+
+        val scale by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = pulseFraction,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1000),
+                repeatMode = RepeatMode.Reverse
+            ), label = ""
+        )
+
+        Box(modifier = Modifier.scale(scale)) {
+            content()
+        }
+    }
+
+    @Composable
     fun HomeScreen(
         data: List<DataModel>?,
         navController: NavController
@@ -308,7 +336,7 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.LightGray)
+                .background(Color.White)
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),

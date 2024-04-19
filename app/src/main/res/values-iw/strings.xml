@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">טפט ישראל</string>
-
-    <string name="set">קיבעתי רקע</string>
-    <string name="start">הורדת התחילה!</string>
-    <string name="failed">ההורדה נכשלה!</string>
-</resources>

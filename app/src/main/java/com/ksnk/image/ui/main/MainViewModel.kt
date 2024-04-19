@@ -15,7 +15,7 @@ import com.ksnk.image.ui.main.MainActivity.Companion.FILE.ENVIRONMENT
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.FORMAT
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.MIME_TYPE
 import com.ksnk.image.ui.main.MainActivity.Companion.FILE.TITLE
-import com.ksnk.israelimage.R
+import com.ksnk.kyivimage.R
 import kotlinx.coroutines.launch
 import java.io.File
 

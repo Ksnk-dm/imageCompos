@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="set">Заставку встановлено</string>
+    <string name="start">Завантаження!</string>
+    <string name="failed">Помилка завантаження!</string>
+</resources>
