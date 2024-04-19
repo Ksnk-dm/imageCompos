@@ -14,11 +14,11 @@ Main features:
 - Setting as wallpaper
 
 Libraries:
--Compose
--Koin
--Retrofit
--Lottie
--AdMob
+- Compose
+- Koin
+- Retrofit
+- Lottie
+- AdMob
 
 Images Viewer is available on the Google Play Store.
 
