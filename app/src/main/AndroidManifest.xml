@@ -21,7 +21,6 @@
         <activity
             android:name="com.ksnk.image.ui.main.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.ImageTrump">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +32,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2981423664535117~7287977748" />
+            android:value="ca-app-pub-2981423664535117~8892836908" />
     </application>
 
 </manifest>

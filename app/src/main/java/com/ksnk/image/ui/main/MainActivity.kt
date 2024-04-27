@@ -48,13 +48,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -78,7 +78,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.ksnk.image.remote.model.DataModel
 import com.ksnk.image.ui.theme.ImageIsraelTheme
-import com.ksnk.israelimage.R
+import com.ksnk.liver.image.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -262,32 +262,37 @@ class MainActivity : ComponentActivity() {
     fun SplashScreen(navController: NavController) {
         val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.splash))
 
-        val progress by animateLottieCompositionAsState(
-            composition = composition,
-            iterations = LottieConstants.IterateForever
-        )
         Column(
             modifier = Modifier
-                .background(Color.LightGray)
+                .background(
+                    colorResource(id = R.color.black)
+                )
         ) {
-            LottieAnimation(
-                composition = composition,
-                progress = {
-                    progress
-                }
-            )
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = getString(R.string.app_name),
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
-                    color = Black
-                )
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "logo",
+                        Modifier.size(300.dp)
+                    )
+                    Text(
+                        modifier = Modifier
+                            .size(300.dp)
+                            .padding(top = 30.dp),
+                        text = getString(R.string.app_name),
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        color = White
+                    )
+                }
             }
         }
         LaunchedEffect(Unit) {
@@ -308,7 +313,7 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.LightGray)
+                .background(Color.Black)
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -369,11 +374,6 @@ class MainActivity : ComponentActivity() {
             ) {
             }
         }
-    }
-
-    @Composable
-    fun GreetingPreview(navController: NavController) {
-
     }
 
     private fun navigateToPicture(navController: NavController, position: Int) {
@@ -439,15 +439,15 @@ class MainActivity : ComponentActivity() {
 
         private const val KEY_POSITION = "position"
 
-        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/4143256887"
-        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/5699881134"
+        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/3640510223"
+        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/7755516064"
 
         private const val RANDOM = 2
 
         object FILE {
             val ENVIRONMENT = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "USA IMAGES/IMAGES"
+                "LIVERPOOL IMAGES/IMAGES"
             )
 
             const val TITLE = "Picture"

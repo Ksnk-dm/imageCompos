@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ksnk.israelimage"
+    namespace = "com.ksnk.liver.image"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ksnk.israelimage"
+        applicationId = "com.ksnk.liver.image"
         minSdk = 30
         targetSdk = 34
         versionCode = 3

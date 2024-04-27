@@ -5,7 +5,7 @@ import retrofit2.http.GET
 
 interface Api {
 
-    @GET("israel_images.ksnk")
+    @GET("images/liver_images")
     suspend fun getApi(): List<DataModel>
 
 }
