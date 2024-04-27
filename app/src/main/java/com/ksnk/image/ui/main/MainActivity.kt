@@ -467,8 +467,8 @@ class MainActivity : ComponentActivity() {
 
         private const val KEY_POSITION = "position"
 
-        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/4143256887"
-        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/5699881134"
+        private const val AD_ID_INTERESTIAL = "ca-app-pub-2981423664535117/4386615681"
+        private const val AD_ID_BANNER = "ca-app-pub-2981423664535117/9638942368"
 
         private const val RANDOM = 2
 
